@@ -52,7 +52,7 @@ for i, each_note in enumerate(all_note):
     index_of_this_note = np.where(note_list == each_note)[0][0]
     index_of_next_note = np.where(note_list == all_note[i+1])[0][0]
     transMatrix[index_of_this_note][index_of_next_note]+=1
-# turn the matrix into probability
+# turn the matrix into Probability Density Function
 note_count = 0
 cumsum = 0.0
 for i in range(len(note_list)):
@@ -71,3 +71,17 @@ for i in range(len(note_list)):
 #plt.show()
 
 np.savetxt('transMatrix.csv', transMatrix, delimiter=',')
+
+
+# Save piano note list to midi
+noteMidi = mido.MidiFile()
+track = mido.MidiTrack()
+noteMidi.tracks.append(track)
+track.append(mido.Message('program_change', program=0, time=0))
+for i, each_note in enumerate(note_list):
+    if(i==0):
+        track.append(mido.Message('note_on', note=each_note, velocity=64, time=0))
+    else:
+        track.append(mido.Message('note_on', note=each_note, velocity=64, time=480))
+    track.append(mido.Message('note_off', note=each_note, velocity=64, time=480))
+noteMidi.save("NoteList.mid")
